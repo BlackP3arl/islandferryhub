@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Operator {
+  id              String   @id @default(cuid())
+  name            String
+  boatName        String
+  logoUrl         String?
+  contactNumber   String
+  liveLocationUrl String?
+  ticketingUrl    String?
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  routes Route[]
+}
+
+model Route {
+  id         String   @id @default(cuid())
+  operatorId String
+  routeName  String?  // Optional name like "Morning Route", "Express"
+  order      Int      // For ordering routes
+  operator   Operator @relation(fields: [operatorId], references: [id], onDelete: Cascade)
+  
+  stops    RouteStop[]
+  schedule Schedule?
+}
+
+model RouteStop {
+  id       String @id @default(cuid())
+  routeId  String
+  island   String
+  order    Int
+  route    Route  @relation(fields: [routeId], references: [id], onDelete: Cascade)
+}
+
+model Schedule {
+  id             String  @id @default(cuid())
+  routeId        String  @unique
+  departureTimes String  // JSON array like ["08:00", "14:00"]
+  daysOfWeek     String  // JSON array like [0,1,2,3,4,5,6]
+  route          Route   @relation(fields: [routeId], references: [id], onDelete: Cascade)
+}
