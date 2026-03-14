@@ -310,7 +310,7 @@ export default function OperatorForm({ operator, onClose, onSaved }: Props) {
           <div className="flex items-center gap-4 mb-3">
             <div className="w-16 h-16 rounded-xl bg-blue-50 dark:bg-slate-700 flex items-center justify-center overflow-hidden shrink-0">
               {logoUrl ? (
-                <Image src={logoUrl} alt="Logo" width={64} height={64} className="w-full h-full object-contain" unoptimized={logoUrl.startsWith('http')} />
+                <Image src={logoUrl} alt="Logo" width={64} height={64} className="w-full h-full object-contain" unoptimized />
               ) : (
                 <SpeedboatIcon className="w-10 h-10" color="blue" />
               )}

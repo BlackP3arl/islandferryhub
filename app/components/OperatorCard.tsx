@@ -136,7 +136,7 @@ export default function OperatorCard({ operator }: { operator: Operator }) {
                 width={44}
                 height={44}
                 className="w-full h-full object-contain"
-                unoptimized={operator.logoUrl.startsWith('http')}
+                unoptimized
               />
             ) : (
               <SpeedboatIcon className="w-6 h-6" color="blue" />

@@ -76,7 +76,7 @@ export default function OperatorList({ operators, loading, onEdit, onDelete, onT
             {/* Logo */}
             <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-slate-700 flex items-center justify-center shrink-0 overflow-hidden">
               {op.logoUrl ? (
-                <Image src={op.logoUrl} alt="" width={48} height={48} className="w-full h-full object-contain" unoptimized={op.logoUrl.startsWith('http')} />
+                <Image src={op.logoUrl} alt="" width={48} height={48} className="w-full h-full object-contain" unoptimized />
               ) : (
                 <SpeedboatIcon className="w-7 h-7" color="blue" />
               )}
