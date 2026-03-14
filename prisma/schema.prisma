@@ -16,6 +16,8 @@ model Operator {
   liveLocationUrl String?
   ticketingUrl    String?
   isActive        Boolean  @default(true)
+  isFeatured      Boolean  @default(false)
+  featuredExpiry  DateTime?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
@@ -47,4 +49,15 @@ model Schedule {
   departureTimes String  // JSON array like ["08:00", "14:00"]
   daysOfWeek     String  // JSON array like [0,1,2,3,4,5,6]
   route          Route   @relation(fields: [routeId], references: [id], onDelete: Cascade)
+}
+
+model FeatureRequest {
+  id          String   @id @default(cuid())
+  name        String
+  email       String
+  mobile      String
+  message     String?
+  status      String   @default("pending") // pending, contacted, completed, rejected
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

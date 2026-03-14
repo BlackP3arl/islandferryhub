@@ -1,5 +1,8 @@
 import { Suspense } from 'react'
 import { prisma } from '@/lib/prisma'
+import { redirect } from 'next/navigation'
+import Link from 'next/link'
+import Image from 'next/image'
 import OperatorCard from './components/OperatorCard'
 import SearchBar from './components/SearchBar'
 import SpeedboatIcon from './components/SpeedboatIcon'
@@ -7,6 +10,44 @@ import ThemeToggle from './components/ThemeToggle'
 
 interface PageProps {
   searchParams: Promise<{ search?: string }>
+}
+
+async function getFeaturedOperator() {
+  const operator = await prisma.operator.findFirst({
+    where: {
+      isFeatured: true,
+      isActive: true,
+    },
+    include: {
+      routes: {
+        orderBy: { order: 'asc' },
+        include: {
+          stops: { orderBy: { order: 'asc' } },
+          schedule: true,
+        },
+      },
+    },
+  })
+  
+  // If no featured operator, check if any featured has expired
+  if (!operator) {
+    // Check for expired featured
+    const expired = await prisma.operator.findMany({
+      where: {
+        isFeatured: true,
+        featuredExpiry: { lt: new Date() },
+      },
+    })
+    if (expired.length > 0) {
+      // Unfeature expired
+      await prisma.operator.updateMany({
+        where: { featuredExpiry: { lt: new Date() } },
+        data: { isFeatured: false, featuredExpiry: null },
+      })
+    }
+  }
+  
+  return operator
 }
 
 async function OperatorsList({ search }: { search: string }) {
@@ -56,6 +97,7 @@ async function OperatorsList({ search }: { search: string }) {
 
 export default async function HomePage({ searchParams }: PageProps) {
   const { search = '' } = await searchParams
+  const featuredOperator = await getFeaturedOperator()
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-[#0B1120] transition-colors">
@@ -83,9 +125,57 @@ export default async function HomePage({ searchParams }: PageProps) {
             <span className="bg-gradient-to-r from-blue-400 to-teal-400 bg-clip-text text-transparent">across the Maldives</span>
           </h1>
 
-          <p className="text-gray-400 text-base md:text-lg max-w-lg mx-auto mb-10 leading-relaxed">
+          <p className="text-gray-400 text-base md:text-lg max-w-lg mx-auto mb-6 leading-relaxed">
             All operators, schedules, and routes in one place.
           </p>
+
+          {/* Featured Operator Banner */}
+          {featuredOperator ? (
+            <div className="inline-flex items-center gap-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl px-6 py-4 mb-8">
+              <span className="text-xs text-amber-400 font-semibold uppercase tracking-wider">Featured</span>
+              <div className="flex items-center gap-3">
+                {featuredOperator.logoUrl ? (
+                  <Image 
+                    src={featuredOperator.logoUrl} 
+                    alt={featuredOperator.name}
+                    width={40}
+                    height={40}
+                    className="w-10 h-10 rounded-lg object-contain bg-white"
+                    unoptimized={featuredOperator.logoUrl.startsWith('http')}
+                  />
+                ) : (
+                  <SpeedboatIcon className="w-10 h-10" />
+                )}
+                <div className="text-left">
+                  <p className="font-semibold text-white">{featuredOperator.name}</p>
+                  <p className="text-sm text-gray-400">{featuredOperator.boatName}</p>
+                </div>
+              </div>
+              {featuredOperator.ticketingUrl && (
+                <a
+                  href={featuredOperator.ticketingUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ml-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded-lg transition-colors"
+                >
+                  Book Now
+                </a>
+              )}
+            </div>
+          ) : (
+            <div className="inline-flex items-center gap-4 bg-amber-500/20 backdrop-blur-sm border border-amber-500/30 rounded-2xl px-6 py-4 mb-8">
+              <div className="text-left">
+                <p className="font-semibold text-amber-200">Advertise Here</p>
+                <p className="text-sm text-gray-400">Get your business featured on our homepage</p>
+              </div>
+              <Link
+                href="/contact"
+                className="ml-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded-lg transition-colors"
+              >
+                Contact Us
+              </Link>
+            </div>
+          )}
 
           <div className="flex flex-wrap justify-center gap-6 text-sm text-gray-500">
             <div className="flex items-center gap-2">

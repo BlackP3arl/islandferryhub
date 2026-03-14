@@ -32,6 +32,7 @@ interface Operator {
   liveLocationUrl: string | null
   ticketingUrl: string | null
   isActive: boolean
+  isFeatured: boolean
   routes: Route[]
 }
 
@@ -42,9 +43,10 @@ interface Props {
   loading: boolean
   onEdit: (op: Operator) => void
   onDelete: (id: string) => void
+  onToggleFeatured?: (op: Operator) => void
 }
 
-export default function OperatorList({ operators, loading, onEdit, onDelete }: Props) {
+export default function OperatorList({ operators, loading, onEdit, onDelete, onToggleFeatured }: Props) {
   if (loading) {
     return (
       <div className="space-y-3">
@@ -89,6 +91,9 @@ export default function OperatorList({ operators, loading, onEdit, onDelete }: P
                 {!op.isActive && (
                   <span className="text-xs bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-2 py-0.5 rounded-full">Inactive</span>
                 )}
+                {op.isFeatured && (
+                  <span className="text-xs bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 px-2 py-0.5 rounded-full">⭐ Featured</span>
+                )}
               </div>
               
               {/* Routes summary */}
@@ -113,6 +118,18 @@ export default function OperatorList({ operators, loading, onEdit, onDelete }: P
 
             {/* Actions */}
             <div className="flex items-center gap-2 shrink-0">
+              {onToggleFeatured && (
+                <button
+                  onClick={() => onToggleFeatured(op)}
+                  className={`text-sm px-3 py-1.5 rounded-lg font-medium transition-colors ${
+                    op.isFeatured
+                      ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-900/50'
+                      : 'bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600'
+                  }`}
+                >
+                  {op.isFeatured ? '⭐ Unfeature' : '⭐ Feature'}
+                </button>
+              )}
               <button
                 onClick={() => onEdit(op)}
                 className="text-sm bg-blue-50 dark:bg-slate-700 hover:bg-blue-100 dark:hover:bg-slate-600 text-blue-700 dark:text-blue-300 px-3 py-1.5 rounded-lg font-medium transition-colors"

@@ -6,6 +6,26 @@ function checkAuth(request: NextRequest) {
   return authHeader === process.env.ADMIN_PASSWORD
 }
 
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  if (!checkAuth(request)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const { id } = await params
+  const body = await request.json()
+  const { isFeatured, featuredExpiry } = body
+
+  const operator = await prisma.operator.update({
+    where: { id },
+    data: {
+      isFeatured: isFeatured ?? false,
+      featuredExpiry: featuredExpiry ?? null,
+    },
+  })
+
+  return NextResponse.json(operator)
+}
+
 export async function GET(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const operator = await prisma.operator.findUnique({
