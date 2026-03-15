@@ -33,6 +33,8 @@ interface Operator {
   ticketingUrl: string | null
   isActive: boolean
   isFeatured: boolean
+  hasFixedSchedule: boolean
+  socialLinks: string
   routes: Route[]
 }
 

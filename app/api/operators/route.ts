@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json()
-  const { name, boatName, logoUrl, contactNumber, liveLocationUrl, ticketingUrl, routes } = body
+  const { name, boatName, logoUrl, contactNumber, liveLocationUrl, ticketingUrl, hasFixedSchedule, socialLinks, routes } = body
 
   // routes is an array of: { routeName, stops: [islands], schedule: { days: [nums], times: [strings] } }
 
@@ -53,6 +53,8 @@ export async function POST(request: NextRequest) {
       contactNumber,
       liveLocationUrl: liveLocationUrl || null,
       ticketingUrl: ticketingUrl || null,
+      hasFixedSchedule: hasFixedSchedule ?? true,
+      socialLinks: socialLinks || '{}',
       routes: {
         create: routes.map((route: any, routeIndex: number) => ({
           routeName: route.routeName || null,

@@ -18,6 +18,11 @@ model Operator {
   isActive        Boolean  @default(true)
   isFeatured      Boolean  @default(false)
   featuredExpiry  DateTime?
+  
+  // Schedule options
+  hasFixedSchedule Boolean  @default(true)  // true = has fixed schedule, false = check social channels
+  socialLinks      String   // JSON: {"whatsapp":"", "facebook":"", "viber":""}
+  
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 

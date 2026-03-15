@@ -51,7 +51,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
   const { id } = await params
   const body = await request.json()
-  const { name, boatName, logoUrl, contactNumber, liveLocationUrl, ticketingUrl, routes, isActive } = body
+  const { name, boatName, logoUrl, contactNumber, liveLocationUrl, ticketingUrl, routes, isActive, hasFixedSchedule, socialLinks } = body
 
   // First get existing routes to delete their related data
   const existingRoutes = await prisma.route.findMany({ where: { operatorId: id } })
@@ -74,6 +74,8 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       liveLocationUrl: liveLocationUrl || null,
       ticketingUrl: ticketingUrl || null,
       isActive: isActive ?? true,
+      hasFixedSchedule: hasFixedSchedule ?? true,
+      socialLinks: socialLinks || '{}',
       routes: {
         create: routes.map((route: any, routeIndex: number) => ({
           routeName: route.routeName || null,

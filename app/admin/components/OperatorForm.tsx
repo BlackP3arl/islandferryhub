@@ -33,6 +33,8 @@ interface Operator {
   liveLocationUrl: string | null
   ticketingUrl: string | null
   isActive: boolean
+  hasFixedSchedule: boolean
+  socialLinks: string
   routes: Route[]
 }
 
@@ -62,6 +64,17 @@ export default function OperatorForm({ operator, onClose, onSaved }: Props) {
   const [ticketingUrl, setTicketingUrl] = useState(operator?.ticketingUrl || '')
   const [logoUrl, setLogoUrl] = useState(operator?.logoUrl || '')
   const [isActive, setIsActive] = useState(operator?.isActive ?? true)
+  const [hasFixedSchedule, setHasFixedSchedule] = useState(operator?.hasFixedSchedule ?? true)
+  
+  // Social links state
+  const [socialLinks, setSocialLinks] = useState<{whatsapp: string; facebook: string; viber: string}>(() => {
+    if (operator?.socialLinks) {
+      try {
+        return JSON.parse(operator.socialLinks)
+      } catch { return { whatsapp: '', facebook: '', viber: '' } }
+    }
+    return { whatsapp: '', facebook: '', viber: '' }
+  })
 
   // Routes - each with stops and schedule
   const [routes, setRoutes] = useState<RouteInput[]>(() => {
@@ -212,6 +225,8 @@ export default function OperatorForm({ operator, onClose, onSaved }: Props) {
       liveLocationUrl: liveLocationUrl || null,
       ticketingUrl: ticketingUrl || null,
       isActive,
+      hasFixedSchedule,
+      socialLinks: JSON.stringify(socialLinks),
       routes: validRoutes.map(route => ({
         routeName: route.routeName || null,
         stops: route.stops.filter(s => s.trim()),
@@ -300,6 +315,79 @@ export default function OperatorForm({ operator, onClose, onSaved }: Props) {
                 />
                 <span className="text-sm text-gray-600 dark:text-gray-400">Show on website</span>
               </label>
+            </div>
+          </div>
+        </section>
+
+        {/* Schedule Options */}
+        <section>
+          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 uppercase tracking-wide">Schedule Type</h3>
+          <div className="space-y-4">
+            {/* Fixed schedule toggle */}
+            <div className="flex items-center gap-4">
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="hasFixedSchedule"
+                  checked={hasFixedSchedule === true}
+                  onChange={() => setHasFixedSchedule(true)}
+                  className="w-4 h-4 text-blue-600"
+                />
+                <span className="text-sm text-gray-700 dark:text-gray-300">Has fixed schedule</span>
+              </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="hasFixedSchedule"
+                  checked={hasFixedSchedule === false}
+                  onChange={() => setHasFixedSchedule(false)}
+                  className="w-4 h-4 text-blue-600"
+                />
+                <span className="text-sm text-gray-700 dark:text-gray-300">No fixed schedule</span>
+              </label>
+            </div>
+
+            {/* Social links - show if no fixed schedule OR always show as optional */}
+            <div className="bg-gray-50 dark:bg-slate-700/50 rounded-xl p-4 space-y-3">
+              <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                {hasFixedSchedule ? 'Also share schedule via (optional):' : 'Where to find schedule:'}
+              </p>
+              
+              {/* WhatsApp */}
+              <div className="flex items-center gap-2">
+                <span className="text-sm w-20 text-gray-600 dark:text-gray-400">WhatsApp</span>
+                <input
+                  type="url"
+                  value={socialLinks.whatsapp}
+                  onChange={e => setSocialLinks({ ...socialLinks, whatsapp: e.target.value })}
+                  className="flex-1 border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-1.5 text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-white"
+                  placeholder="https://chat.whatsapp.com/..."
+                />
+              </div>
+              
+              {/* Facebook */}
+              <div className="flex items-center gap-2">
+                <span className="text-sm w-20 text-gray-600 dark:text-gray-400">Facebook</span>
+                <input
+                  type="url"
+                  value={socialLinks.facebook}
+                  onChange={e => setSocialLinks({ ...socialLinks, facebook: e.target.value })}
+                  className="flex-1 border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-1.5 text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-white"
+                  placeholder="https://facebook.com/..."
+                />
+              </div>
+              
+              {/* Viber */}
+              <div className="flex items-center gap-2">
+                <span className="text-sm w-20 text-gray-600 dark:text-gray-400">Viber</span>
+                <input
+                  type="url"
+                  value={socialLinks.viber}
+                  onChange={e => setSocialLinks({ ...socialLinks, viber: e.target.value })}
+                  className="flex-1 border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-1.5 text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-white"
+                  placeholder="https://viber.com/..."
+                />
+              </div>
             </div>
           </div>
         </section>
