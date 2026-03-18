@@ -250,8 +250,12 @@ export default function OperatorForm({ operator, onClose, onSaved }: Props) {
       onSaved()
       onClose()
     } else {
-      const data = await res.json()
-      setError(data.error || 'Failed to save')
+      try {
+        const data = await res.json()
+        setError(data.error || 'Failed to save')
+      } catch {
+        setError('Failed to save. Please try again.')
+      }
     }
     setSaving(false)
   }
